@@ -15,6 +15,22 @@ from bot.helper.ext_utils.links_utils import is_gdrive_id
 from bot.helper.mirror_leech_utils.gdrive_utils.search import gdSearch
 
 
+async def limit_checker(
+        listener,
+        isTorrent=False,
+        isMega=False,
+        isDriveLink=False,
+        isRclone=False,
+    ):
+    try:
+        if await isAdmin(listener.message):
+            return
+    except Exception as e:
+        LOGGER.error(f"Error while checking if the user is Admin: {e}")
+
+    GB = 1024 ** 3
+    limit_exceeded = ""
+
 async def stop_duplicate_check(listener):
     if (
         isinstance(listener.upDest, int)
@@ -51,6 +67,11 @@ async def stop_duplicate_check(listener):
             return msg, button
 
     return False, None
+
+async def check_limits_size(listener, size, playlist=False, play_count=False):
+    msgerr = None
+    max_pyt, megadl, torddl, zuzdl, leechdl, storage = (config_dict["MAX_YTPLAYLIST"], config_dict["MEGA_LIMIT"], config_dict["TORRENT_DIRECT_LIMIT"],
+config_dict["ZIP_UNZIP_LIMIT"], config_dict["LEECH_LIMIT"], config_dict["STORAGE_THRESHOLD"])
 
 
 async def check_running_tasks(listener, state="dl"):
