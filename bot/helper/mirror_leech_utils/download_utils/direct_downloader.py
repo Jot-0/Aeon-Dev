@@ -13,6 +13,7 @@ from bot.helper.ext_utils.bot_utils import sync_to_async
 from bot.helper.ext_utils.task_manager import (
     check_running_tasks,
     stop_duplicate_check,
+    check_limits_size
 )
 from bot.helper.listeners.direct_listener import DirectListener
 from bot.helper.telegram_helper.message_utils import sendStatusMessage
@@ -35,6 +36,11 @@ async def add_direct_download(listener, path):
     if msg:
         await listener.onDownloadError(msg, button)
         return
+
+    if msg := await check_limits_size(self._listener, media.file_size):
+                    LOGGER.info("File/folder size over the limit size!")
+                    await self._onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(media.file_size)}.")
+                    return
 
     gid = token_hex(4)
     add_to_queue, event = await check_running_tasks(listener)
