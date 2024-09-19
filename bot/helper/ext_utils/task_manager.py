@@ -17,10 +17,10 @@ from bot.helper.mirror_leech_utils.gdrive_utils.search import gdSearch
 
 async def limit_checker(
         listener,
-        isTorrent=False,
-        isMega=False,
-        isDriveLink=False,
-        isRclone=False,
+        is_Torrent=False,
+        is_Mega=False,
+        is_DriveLink=False,
+        is_Rclone=False,
     ):
     try:
         if await isAdmin(listener.message):
@@ -73,12 +73,12 @@ async def check_limits_size(listener, size, playlist=False, play_count=False):
     max_pyt, megadl, torddl, zuzdl, leechdl = (config_dict["MAX_YTPLAYLIST"], config_dict["MEGA_LIMIT"], config_dict["TORRENT_DIRECT_LIMIT"],
 config_dict["ZIP_UNZIP_LIMIT"], config_dict["LEECH_LIMIT"])
 
-    arch = any([listener.compress, listener.isLeech, listener.extract])
+    arch = any([listener.compress, listener.is_Leech, listener.extract])
     if torddl and not arch and size >= torddl * 1024**3:
         msgerr = f"Torrent/direct limit is {torddl}GB"
     elif zuzdl and any([listener.compress, listener.extract]) and size >= zuzdl * 1024**3:
         msgerr = f"Zip/Unzip limit is {zuzdl}GB"
-    elif leechdl and listener.isLeech and size >= leechdl * 1024**3:
+    elif leechdl and listener.is_Leech and size >= leechdl * 1024**3:
         msgerr = f"Leech limit is {leechdl}GB"
     if is_mega_link(listener.link) and megadl and size >= megadl * 1024**3:
         msgerr = f"Mega limit is {megadl}GB"
