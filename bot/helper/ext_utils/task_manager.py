@@ -71,7 +71,7 @@ async def stop_duplicate_check(listener):
 async def check_limits_size(listener, size, playlist=False, play_count=False):
     msgerr = None
     max_pyt, megadl, torddl, zuzdl, leechdl = (config_dict["MAX_YTPLAYLIST"], config_dict["MEGA_LIMIT"], config_dict["TORRENT_DIRECT_LIMIT"],
-config_dict["ZIP_UNZIP_LIMIT"], config_dict["LEECH_LIMIT"])
+config_dict["ZIP_UNZIP_LIMIT"], config_dict["LEECH_LIMIT"], config_dict["STORAGE_THRESHOLD"])
 
     arch = any([listener.compress, listener.is_leech, listener.extract])
     if torddl and not arch and size >= torddl * 1024**3:
@@ -84,6 +84,8 @@ config_dict["ZIP_UNZIP_LIMIT"], config_dict["LEECH_LIMIT"])
         msgerr = f"Mega limit is {megadl}GB"
     if max_pyt and playlist and (play_count > max_pyt):
         msgerr = f"Only {max_pyt} playlist allowed. Current playlist is {play_count}."
+    if storage and not await check_storage_threshold(size, arch):
+        msgerr = f"Need {storage}GB free storage."
     return msgerr
 
 async def check_running_tasks(listener, state="dl"):
