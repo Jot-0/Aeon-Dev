@@ -15,6 +15,7 @@ from bot import (
 from bot.helper.ext_utils.task_manager import (
     check_running_tasks,
     stop_duplicate_check,
+    check_limits_size,
 )
 from bot.helper.telegram_helper.message_utils import sendStatusMessage
 from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
@@ -128,6 +129,11 @@ class TelegramDownloadHelper:
                 msg, button = await stop_duplicate_check(self._listener)
                 if msg:
                     await self._listener.onDownloadError(msg, button)
+                    return
+
+                if msg := await check_limits_size(self._listener, size):
+                    LOGGER.info('File/folder size over the limit size!')
+                    await self._onDownloadError(f'{msg}. File/folder size is {get_readable_file_size(size)}.')
                     return
 
                 add_to_queue, event = await check_running_tasks(self._listener)
