@@ -134,7 +134,7 @@ class TelegramDownloadHelper:
 
                 if msg := await check_limits_size(self._listener, media.file_size):
                     LOGGER.info("File/folder size over the limit size!")
-                    await self._onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(size)}.")
+                    await self._onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(media.file_size)}.")
                     return
 
                 add_to_queue, event = await check_running_tasks(self._listener)
