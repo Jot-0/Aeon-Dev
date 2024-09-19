@@ -185,6 +185,35 @@ DEFAULT_UPLOAD = environ.get("DEFAULT_UPLOAD", "")
 if DEFAULT_UPLOAD != "rc":
     DEFAULT_UPLOAD = "gd"
 
+    CLONE_LIMIT = environ.get("CLONE_LIMIT", "")
+    CLONE_LIMIT = float(CLONE_LIMIT) if CLONE_LIMIT else ""
+
+    LEECH_LIMIT = environ.get("LEECH_LIMIT", "")
+    LEECH_LIMIT = float(LEECH_LIMIT) if LEECH_LIMIT else ""
+
+    LEECH_SPLIT_SIZE = environ.get("LEECH_SPLIT_SIZE", "")
+    LEECH_SPLIT_SIZE = int(LEECH_SPLIT_SIZE) if LEECH_SPLIT_SIZE else ""
+
+    MEGA_LIMIT = environ.get("MEGA_LIMIT", "")
+    MEGA_LIMIT = float(MEGA_LIMIT) if MEGA_LIMIT else ""
+
+    STATUS_LIMIT = environ.get("STATUS_LIMIT", "")
+    STATUS_LIMIT = int(STATUS_LIMIT) if STATUS_LIMIT else 10
+
+    TORRENT_DIRECT_LIMIT = environ.get("TORRENT_DIRECT_LIMIT", "")
+    TORRENT_DIRECT_LIMIT = float(TORRENT_DIRECT_LIMIT) if TORRENT_DIRECT_LIMIT else ""
+
+    TOTAL_TASKS_LIMIT = environ.get("TOTAL_TASKS_LIMIT", "")
+    TOTAL_TASKS_LIMIT = int(TOTAL_TASKS_LIMIT) if TOTAL_TASKS_LIMIT else ""
+
+    USER_TASKS_LIMIT = environ.get("USER_TASKS_LIMIT", "")
+    USER_TASKS_LIMIT = int(USER_TASKS_LIMIT) if USER_TASKS_LIMIT else ""
+
+    ZIP_UNZIP_LIMIT = environ.get("ZIP_UNZIP_LIMIT", "")
+    ZIP_UNZIP_LIMIT = float(ZIP_UNZIP_LIMIT) if ZIP_UNZIP_LIMIT else ""
+
+    MAX_YTPLAYLIST = environ.get("MAX_YTPLAYLIST", "")
+    MAX_YTPLAYLIST = int(MAX_YTPLAYLIST) if MAX_YTPLAYLIST else ""
 
 def load_user_data():
     AUTHORIZED_CHATS = environ.get("AUTHORIZED_CHATS", "")
@@ -219,17 +248,22 @@ config_dict = {
     "AUTHORIZED_CHATS": environ.get("AUTHORIZED_CHATS", ""),
     "BASE_URL": environ.get("BASE_URL", "").rstrip("/"),
     "CMD_SUFFIX": environ.get("CMD_SUFFIX", ""),
+    "CLONE_LIMIT": CLONE_LIMIT,
     "DEFAULT_UPLOAD": DEFAULT_UPLOAD,
     "EXTENSION_FILTER": environ.get("EXTENSION_FILTER", ""),
     "FSUB_IDS": environ.get("FSUB_IDS", ""),
     "FILELION_API": environ.get("FILELION_API", ""),
     "GDRIVE_ID": environ.get("GDRIVE_ID", ""),
     "INDEX_URL": environ.get("INDEX_URL", "").rstrip("/"),
+    "LEECH_SPLIT_SIZE": LEECH_SPLIT_SIZE,
+    "LEECH_LIMIT": LEECH_LIMIT,
     "IS_TEAM_DRIVE": environ.get("IS_TEAM_DRIVE", "").lower() == "true",
     "LEECH_DUMP_CHAT": int(environ.get("LEECH_DUMP_CHAT", 0)),
     "LOG_CHAT": int(environ.get("LOG_CHAT", 0)),
     "MEGA_EMAIL": environ.get("MEGA_EMAIL", ""),
     "MEGA_PASSWORD": environ.get("MEGA_PASSWORD", ""),
+    "MEGA_LIMIT": MEGA_LIMIT,
+    "MAX_YTPLAYLIST": MAX_YTPLAYLIST,
     "PAID_CHAT_ID": environ.get("PAID_CHAT_ID", ""),
     "PAID_CHAT_LINK": environ.get("PAID_CHAT_LINK", ""),
     "QUEUE_ALL": get_env_int("QUEUE_ALL"),
@@ -239,13 +273,18 @@ config_dict = {
     "RCLONE_PATH": environ.get("RCLONE_PATH", ""),
     "STOP_DUPLICATE": environ.get("STOP_DUPLICATE", "").lower() == "true",
     "STREAMWISH_API": environ.get("STREAMWISH_API", ""),
+    "STATUS_LIMIT": STATUS_LIMIT,
     "SUDO_USERS": environ.get("SUDO_USERS", ""),
     "TOKEN_TIMEOUT": get_env_int("TOKEN_TIMEOUT"),
+    "TOTAL_TASKS_LIMIT": TOTAL_TASKS_LIMIT,
+    "TORRENT_DIRECT_LIMIT": TORRENT_DIRECT_LIMIT,
     "UPSTREAM_REPO": environ.get("UPSTREAM_REPO", "https://github.com/5hojib/Aeon"),
     "UPSTREAM_BRANCH": environ.get("UPSTREAM_BRANCH", "main"),
     "USER_SESSION_STRING": environ.get("USER_SESSION_STRING", ""),
     "USE_SA": environ.get("USE_SA", "").lower() == "true",
+    "USER_TASKS_LIMIT": USER_TASKS_LIMIT,
     "YT_DLP_OPTIONS": environ.get("YT_DLP_OPTIONS", ""),
+    "ZIP_UNZIP_LIMIT": ZIP_UNZIP_LIMIT,
 }
 
 if GDID := environ.get("GDRIVE_ID"):
