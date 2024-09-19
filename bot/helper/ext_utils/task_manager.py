@@ -73,6 +73,20 @@ async def check_limits_size(listener, size, playlist=False, play_count=False):
     max_pyt, megadl, torddl, zuzdl, leechdl, storage = (config_dict["MAX_YTPLAYLIST"], config_dict["MEGA_LIMIT"], config_dict["TORRENT_DIRECT_LIMIT"],
 config_dict["ZIP_UNZIP_LIMIT"], config_dict["LEECH_LIMIT"], config_dict["STORAGE_THRESHOLD"])
 
+    arch = any([listener.compress, listener.isLeech, listener.extract])
+    if torddl and not arch and size >= torddl * 1024**3:
+        msgerr = f"Torrent/direct limit is {torddl}GB"
+    elif zuzdl and any([listener.compress, listener.extract]) and size >= zuzdl * 1024**3:
+        msgerr = f"Zip/Unzip limit is {zuzdl}GB"
+    elif leechdl and listener.isLeech and size >= leechdl * 1024**3:
+        msgerr = f"Leech limit is {leechdl}GB"
+    if is_mega_link(listener.link) and megadl and size >= megadl * 1024**3:
+        msgerr = f"Mega limit is {megadl}GB"
+    if max_pyt and playlist and (play_count > max_pyt):
+        msgerr = f"Only {max_pyt} playlist allowed. Current playlist is {play_count}."
+    if storage and not await check_storage_threshold(size, arch):
+        msgerr = f"Need {storage}GB free storage"
+    return msgerr
 
 async def check_running_tasks(listener, state="dl"):
     all_limit = config_dict["QUEUE_ALL"]
