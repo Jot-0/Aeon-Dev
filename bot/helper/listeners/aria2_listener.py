@@ -61,8 +61,8 @@ async def _on_download_started(api, gid):
             
         size = download.total_length
         if msg := await check_limits_size(task.listener, size):
-            LOGGER.info('File/folder size over the limit size!')
-            await gather(task.listener.onDownloadError(f'{msg}. File/folder size is {get_readable_file_size(size)}.'),
+            LOGGER.info("File/folder size over the limit size!")
+            await gather(task.listener.onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(size)}."),
             await sync_to_async(api.remove, [download], force=True, files=True))
             return 
 
