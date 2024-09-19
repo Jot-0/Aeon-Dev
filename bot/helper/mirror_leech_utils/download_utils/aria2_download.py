@@ -14,10 +14,7 @@ from bot import (
     queue_dict_lock,
 )
 from bot.helper.ext_utils.bot_utils import sync_to_async, bt_selection_buttons
-from bot.helper.ext_utils.task_manager import (
-    check_running_tasks,
-    check_limits_size,
-)
+from bot.helper.ext_utils.task_manager import check_running_tasks
 from bot.helper.telegram_helper.message_utils import send_message, sendStatusMessage
 from bot.helper.mirror_leech_utils.status_utils.aria2_status import Aria2Status
 
@@ -57,10 +54,6 @@ async def add_aria2c_download(listener, dpath, header, ratio, seed_time):
         await listener.onDownloadError(error)
         return
 
-    if msg := await check_limits_size(self._listener, media.file_size):
-                    LOGGER.info("File/folder size over the limit size!")
-                    await self._onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(media.file_size)}.")
-                    return
 
     gid = download.gid
     name = download.name
