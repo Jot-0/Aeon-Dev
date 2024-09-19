@@ -51,16 +51,6 @@ async def add_aria2c_download(listener, dpath, header, ratio, seed_time):
         await listener.onDownloadError(f"{e}")
         return
         
-    gid = download.gid
-    task = Aria2Status(listener, gid)
-
-    size = download.total_length
-    if msg := await check_limits_size(task.listener, size):
-        LOGGER.info("File/folder size over the limit size!")
-        await gather(task.listener.onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(size)}."),
-                     sync_to_async(api.remove, [download], force=True, files=True))
-        return
-        
     if await aiopath.exists(listener.link):
         await remove(listener.link)
     if download.error_message:
@@ -68,7 +58,13 @@ async def add_aria2c_download(listener, dpath, header, ratio, seed_time):
         LOGGER.info(f"Aria2c Download Error: {error}")
         await listener.onDownloadError(error)
         return
-
+        
+size = download.total_length
+    if msg := await check_limits_size(listener.link, size):
+        LOGGER.info("File/folder size over the limit size!")
+        await gather(listener.link.onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(size)}."),
+                    sync_to_async(api.remove, [download], force=True, files=True))
+        
     
     name = download.name
     async with task_dict_lock:
