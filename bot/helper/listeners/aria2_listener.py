@@ -52,6 +52,11 @@ async def _on_download_started(api, gid):
         download = await sync_to_async(api.get_download, gid)
         await sleep(2)
         download = await sync_to_async(download.live)
+        size = download.total_length
+        msg, button = await check_limits_size(task.listener, size)
+        if msg:
+            LOGGER.info("File/folder size over the limit size!")
+            await gather(task.listener.onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(size)}."),
         task.listener.name = download.name
         msg, button = await stop_duplicate_check(task.listener)
         if msg:
@@ -59,13 +64,6 @@ async def _on_download_started(api, gid):
             await sync_to_async(api.remove, [download], force=True, files=True)
             return
 
-        size = download.total_length
-        msg, button = await check_limits_size(task.listener, size)
-        if msg:
-            LOGGER.info("File/folder size over the limit size!")
-            await gather(task.listener.onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(size)}."),
-            await sync_to_async(api.remove, [download], force=True, files=True))
-            return 
 
 @new_thread
 async def _on_download_complete(api, gid):
