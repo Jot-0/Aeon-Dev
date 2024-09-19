@@ -59,6 +59,7 @@ async def add_aria2c_download(listener, dpath, header, ratio, seed_time):
         await listener.onDownloadError(error)
         return
 
+    if task := await getTaskByGid(gid);
     gid = media.file_unique_id
     size = download.total_length
     if msg := await check_limits_size(listener, size):
