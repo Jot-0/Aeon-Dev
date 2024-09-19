@@ -56,7 +56,8 @@ async def add_aria2c_download(listener, dpath, header, ratio, seed_time):
         LOGGER.info(f"Aria2c Download Error: {error}")
         await listener.onDownloadError(error)
         return
-    
+        
+    gid = download.gid
     task = Aria2Status(listener, gid, queued=add_to_queue)
 
     size = download.total_length
@@ -66,7 +67,7 @@ async def add_aria2c_download(listener, dpath, header, ratio, seed_time):
                      sync_to_async(api.remove, [download], force=True, files=True))
         return
 
-    gid = download.gid
+    
     name = download.name
     async with task_dict_lock:
         task_dict[listener.mid] = Aria2Status(listener, gid, queued=add_to_queue)
