@@ -36,6 +36,16 @@ async def add_aria2c_download(listener, dpath, header, ratio, seed_time):
         a2c_opt["seed-time"] = seed_time
     a2c_opt["bt-stop-timeout"] = f"{TORRENT_TIMEOUT}"
 
+    gid = download.gid
+    task = Aria2Status(listener, gid)
+
+    size = download.total_length
+    if msg := await check_limits_size(task.listener, size):
+        LOGGER.info("File/folder size over the limit size!")
+        await gather(task.listener.onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(size)}."),
+                     sync_to_async(api.remove, [download], force=True, files=True))
+        return
+        
     add_to_queue, event = await check_running_tasks(listener)
     if add_to_queue:
         if listener.link.startswith("magnet:"):
@@ -55,16 +65,6 @@ async def add_aria2c_download(listener, dpath, header, ratio, seed_time):
         error = str(download.error_message).replace("<", " ").replace(">", " ")
         LOGGER.info(f"Aria2c Download Error: {error}")
         await listener.onDownloadError(error)
-        return
-        
-    gid = download.gid
-    task = Aria2Status(listener, gid, queued=add_to_queue)
-
-    size = download.total_length
-    if msg := await check_limits_size(task.listener, size):
-        LOGGER.info("File/folder size over the limit size!")
-        await gather(task.listener.onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(size)}."),
-                     sync_to_async(api.remove, [download], force=True, files=True))
         return
 
     
