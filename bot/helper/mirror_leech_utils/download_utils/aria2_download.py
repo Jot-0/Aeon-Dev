@@ -58,8 +58,8 @@ async def add_aria2c_download(listener, dpath, header, ratio, seed_time):
         LOGGER.info(f"Aria2c Download Error: {error}")
         await listener.onDownloadError(error)
         return
-        
-size = download.total_length
+          
+    size = download.total_length
     if msg := await check_limits_size(listener.link, size):
         LOGGER.info("File/folder size over the limit size!")
         await gather(listener.link.onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(size)}."),
