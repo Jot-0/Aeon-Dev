@@ -62,14 +62,14 @@ async def _on_download_started(api, gid):
             await sync_to_async(api.remove, [download], force=True, files=True)
             return
 
-        size = download.total_length
-        if msg := await check_limits_size(task.listener, size):
-            LOGGER.info("File/folder size over the limit size!")
-            await gather(task.listener.onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(size)}."),
-            await sync_to_async(api.remove, [download], force=True, files=True))
-            await delete_links(task.listener.message)
-            await auto_delete_message(task.listener.message, msg)
-            return 
+    size = download.total_length
+    if task := await check_limits_size(task.listener, size):
+        LOGGER.info("File/folder size over the limit size!")
+        await gather(task.listener.onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(size)}."),
+        await sync_to_async(api.remove, [download], force=True, files=True))
+        await delete_links(task.listener.message)
+        await auto_delete_message(task.listener.message, msg)
+        return 
 
 @new_thread
 async def _on_download_complete(api, gid):
