@@ -15,7 +15,6 @@ from bot import (
 )
 from bot.helper.ext_utils.bot_utils import sync_to_async, bt_selection_buttons
 from bot.helper.ext_utils.task_manager import check_running_tasks
-from bot.helper.ext_utils.status_utils import get_readable_file_size
 from bot.helper.telegram_helper.message_utils import send_message, sendStatusMessage
 from bot.helper.mirror_leech_utils.status_utils.aria2_status import Aria2Status
 
@@ -80,7 +79,7 @@ async def add_aria2c_download(listener, dpath, header, ratio, seed_time):
         SBUTTONS = bt_selection_buttons(gid)
         msg = "Your download paused. Choose files then press Done Selecting button to start downloading."
         await send_message(listener.message, msg, SBUTTONS)
-        
+
     if add_to_queue:
         await event.wait()
         if listener.isCancelled:
