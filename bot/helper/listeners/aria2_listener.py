@@ -52,23 +52,61 @@ async def _on_download_started(api, gid):
     await sleep(1)
 
     if task := await getTaskByGid(gid):
-        download = await sync_to_async(api.get_download, gid)
+        download = await sync_to_async(
+            api.get_download,
+            gid
+        )
         await sleep(2)
         download = await sync_to_async(download.live)
         task.listener.name = download.name
+        task.listener.isTorrent = download.is_torrent
         msg, button = await stop_duplicate_check(task.listener)
         if msg:
-            await task.listener.onDownloadError(msg, button)
-            await sync_to_async(api.remove, [download], force=True, files=True)
+            await task.listener.onDownloadError(
+                msg,
+                button
+            )
+            await sync_to_async(
+                api.remove,
+                [download],
+                force=True,
+                files=True
+            )
             return
-
-    size = download.total_length
-    if task := await check_limits_size(task.listener, size):
-        LOGGER.info("File/folder size over the limit size!")
-        await gather(task.listener.onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(size)}."),
-                    sync_to_async(api.remove, [download], force=True, files=True))
-        return 
-
+        if download.total_length == 0:
+            start_time = time()
+            while time() - start_time <= 15:
+                await sleep(5)
+                download = await sync_to_async(
+                    api.get_download,
+                    gid
+                )
+                await sync_to_async(download.update)
+                if download.followed_by_ids:
+                    download = await sync_to_async(
+                        api.get_download,
+                        download.followed_by_ids[0]
+                    )
+                    await sync_to_async(download.update)
+                if download.total_length > 0:
+                    break
+        task.listener.size = download.total_length
+        if not task.listener.select:
+            if msg := await check_limits_size(task.listener):
+                LOGGER.info(f"Aria2 Limit Exceeded: {task.listener.name} | {get_readable_file_size(task.listener.size)}")
+                amsg = await task.listener.onDownloadError(msg)
+                await sync_to_async(
+                    api.remove,
+                    [download],
+                    force=True,
+                    files=True
+                )
+                await delete_links(task.listener.message)
+                await auto_delete_message(
+                    task.listener.message,
+                    amsg
+                )
+    
 @new_thread
 async def _on_download_complete(api, gid):
     try:
