@@ -54,13 +54,11 @@ async def _on_download_started(api, gid):
     if task := await getTaskByGid(gid):
         download = await sync_to_async(api.get_download, gid)
         await sleep(2)
-        download = download.live
+        download = await sync_to_async(download.live)
         task.listener.name = download.name
-        file, name = await stop_duplicate_check(task.listener)
-        if file:
-            LOGGER.info("File/folder already in Drive!")
-            task.listener.name = name
-            await task.listener.onDownloadError("File/folder already in Drive!", file)
+        msg, button = await stop_duplicate_check(task.listener)
+        if msg:
+            await task.listener.onDownloadError(msg, button)
             await sync_to_async(api.remove, [download], force=True, files=True)
             return
 
