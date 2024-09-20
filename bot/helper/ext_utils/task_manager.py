@@ -70,8 +70,7 @@ async def stop_duplicate_check(listener):
 
 async def check_limits_size(listener, size, playlist=False, play_count=False):
     msgerr = None
-    max_pyt, megadl, torddl, zuzdl, leechdl, storage = (config_dict["MAX_YTPLAYLIST"], config_dict["MEGA_LIMIT"], config_dict["TORRENT_DIRECT_LIMIT"],
-config_dict["ZIP_UNZIP_LIMIT"], config_dict["LEECH_LIMIT"], config_dict["STORAGE_THRESHOLD"])
+    max_pyt, megadl, torddl, zuzdl, leechdl, storage = (config_dict["MAX_YTPLAYLIST"], config_dict["MEGA_LIMIT"], config_dict["TORRENT_DIRECT_LIMIT"], config_dict["ZIP_UNZIP_LIMIT"], config_dict["LEECH_LIMIT"], config_dict["STORAGE_THRESHOLD"])
 
     arch = any([listener.compress, listener.is_leech, listener.extract])
     if torddl and not arch and size >= torddl * 1024**3:
