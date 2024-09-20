@@ -29,7 +29,7 @@ from bot.helper.mirror_leech_utils.status_utils.aria2_status import Aria2Status
 
 
 @new_thread
-async def _onDownloadStarted(api, gid):
+async def _on_download_started(api, gid):
     download = await sync_to_async(
         api.get_download,
         gid
@@ -37,7 +37,7 @@ async def _onDownloadStarted(api, gid):
     if download.options.follow_torrent == "false":
         return
     if download.is_metadata:
-        LOGGER.info(f"onDownloadStarted: {gid} METADATA")
+        LOGGER.info(f"_on_download_started: {gid} METADATA")
         await sleep(1)
         if task := await getTaskByGid(gid):
             task.listener.isTorrent = True
@@ -99,9 +99,9 @@ async def _onDownloadStarted(api, gid):
                     break
         task.listener.size = download.total_length
         if not task.listener.select:
-            if limit_exceeded := await limit_checker(task.listener):
+            if msg := await limit_checker(task.listener):
                 LOGGER.info(f"Aria2 Limit Exceeded: {task.listener.name} | {get_readable_file_size(task.listener.size)}")
-                amsg = await task.listener.onDownloadError(limit_exceeded)
+                amsg = await task.listener.onDownloadError(msg)
                 await sync_to_async(
                     api.remove,
                     [download],
