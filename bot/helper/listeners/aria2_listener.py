@@ -51,20 +51,21 @@ async def _on_download_started(api, gid):
     if task := await getTaskByGid(gid):
         download = await sync_to_async(api.get_download, gid)
         await sleep(2)
-        download = await sync_to_async(download.live)
+        download = download.live
         task.listener.name = download.name
-        msg, button = await stop_duplicate_check(task.listener)
-        if msg:
-            await task.listener.onDownloadError(msg, button)
+        file, name = await stop_duplicate_check(task.listener)
+        if file:
+            LOGGER.info("File/folder already in Drive!")
+            task.listener.name = name
+            await task.listener.onDownloadError("File/folder already in Drive!", file)
             await sync_to_async(api.remove, [download], force=True, files=True)
             return
-            
+
         size = download.total_length
         if msg := await check_limits_size(task.listener, size):
             LOGGER.info("File/folder size over the limit size!")
             await gather(task.listener.onDownloadError(f"{msg}. File/folder size is {get_readable_file_size(size)}."),
                          sync_to_async(api.remove, [download], force=True, files=True))
-            return 
 
 @new_thread
 async def _on_download_complete(api, gid):
