@@ -29,27 +29,34 @@ from bot.helper.mirror_leech_utils.status_utils.aria2_status import Aria2Status
 
 
 @new_thread
-async def _on_download_started(api, gid):
-    download = await sync_to_async(api.get_download, gid)
+async def _onDownloadStarted(api, gid):
+    download = await sync_to_async(
+        api.get_download,
+        gid
+    )
     if download.options.follow_torrent == "false":
         return
     if download.is_metadata:
-        LOGGER.info(f"on_download_started: {gid} METADATA")
+        LOGGER.info(f"onDownloadStarted: {gid} METADATA")
         await sleep(1)
         if task := await getTaskByGid(gid):
             task.listener.isTorrent = True
             if task.listener.select:
                 metamsg = "Downloading Metadata, wait then you can select files. Use torrent file to avoid this wait."
-                meta = await send_message(task.listener.message, metamsg)
+                meta = await sendMessage(
+                    task.listener.message,
+                    metamsg
+                )
                 while True:
                     await sleep(0.5)
                     if download.is_removed or download.followed_by_ids:
-                        await delete_message(meta)
+                        await deleteMessage(meta)
                         break
-                    download = await sync_to_async(download.live)
+                    await sync_to_async(download.update)
         return
-    LOGGER.info(f"on_download_started: {download.name} - Gid: {gid}")
-    await sleep(1)
+    else:
+        LOGGER.info(f"onAria2DownloadStarted: {download.name} - Gid: {gid}")
+        await sleep(1)
 
     if task := await getTaskByGid(gid):
         download = await sync_to_async(
@@ -57,7 +64,7 @@ async def _on_download_started(api, gid):
             gid
         )
         await sleep(2)
-        download = await sync_to_async(download.live)
+        await sync_to_async(download.update)
         task.listener.name = download.name
         task.listener.isTorrent = download.is_torrent
         msg, button = await stop_duplicate_check(task.listener)
@@ -92,9 +99,9 @@ async def _on_download_started(api, gid):
                     break
         task.listener.size = download.total_length
         if not task.listener.select:
-            if msg := await check_limits_size(task.listener):
+            if limit_exceeded := await limit_checker(task.listener):
                 LOGGER.info(f"Aria2 Limit Exceeded: {task.listener.name} | {get_readable_file_size(task.listener.size)}")
-                amsg = await task.listener.onDownloadError(msg)
+                amsg = await task.listener.onDownloadError(limit_exceeded)
                 await sync_to_async(
                     api.remove,
                     [download],
