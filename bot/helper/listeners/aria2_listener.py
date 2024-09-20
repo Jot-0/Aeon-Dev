@@ -99,7 +99,7 @@ async def _on_download_started(api, gid):
                     break
         task.listener.size = download.total_length
         if not task.listener.select:
-            if msg := await limit_checker(task.listener):
+            if msg := await check_limits_size(task.listener):
                 LOGGER.info(f"Aria2 Limit Exceeded: {task.listener.name} | {get_readable_file_size(task.listener.size)}")
                 amsg = await task.listener.onDownloadError(msg)
                 await sync_to_async(
@@ -107,11 +107,6 @@ async def _on_download_started(api, gid):
                     [download],
                     force=True,
                     files=True
-                )
-                await delete_links(task.listener.message)
-                await auto_delete_message(
-                    task.listener.message,
-                    amsg
                 )
     
 @new_thread
